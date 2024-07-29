@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Page</title>
+</head>
+<body>
+    <h1>Admin Page</h1>
+    <form id="add-audio-form">
+        <label for="audio-file">Add new audio file:</label>
+        <input type="file" id="audio-file" name="audio-file">
+        <button type="submit">Add Audio</button>
+    </form>
+
+    <form id="delete-audio-form">
+        <label for="delete-audio-file">Delete audio file by name:</label>
+        <input type="text" id="delete-audio-file" name="delete-audio-file" placeholder="Audio file name">
+        <button type="submit">Delete Audio</button>
+    </form>
+
+    <script>
+        const addAudioForm = document.getElementById('add-audio-form');
+        const deleteAudioForm = document.getElementById('delete-audio-form');
+
+        addAudioForm.addEventListener('submit', (event) => {
+            event.preventDefault();
+
+            const audioFileInput = document.getElementById('audio-file');
+            const audioFile = audioFileInput.files[0];
+
+            // Send the audio file to the gallery page
+            window.opener.postMessage({ type: 'audioFile', audioFile: audioFile }, '*');
+        });
+
+        deleteAudioForm.addEventListener('submit', (event) => {
+            event.preventDefault();
+
+            const deleteAudioInput = document.getElementById('delete-audio-file');
+            const audioFileName = deleteAudioInput.value;
+
+            // Send the delete request to the gallery page
+            window.opener.postMessage({ type: 'deleteAudio', audioFileName: audioFileName }, '*');
+        });
+    </script>
+</body>
+</html>

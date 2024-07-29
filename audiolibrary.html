@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Audio Gallery</title>
+    <style>
+        .gallery-folder {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+        .gallery-audios {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px;
+            border: 1px solid #ddd;
+            border-radius: 10px;
+            margin: 20px;
+        }
+        .gallery-audios button {
+            margin-top: 10px;
+            background-color: #f44336; /* Red color */
+            color: white;
+            border: none;
+            padding: 5px 10px;
+            cursor: pointer;
+        }
+        .gallery-audios button:hover {
+            background-color: #d32f2f; /* Darker red */
+        }
+    </style>
+</head>
+<body>
+    <h1>Audio Gallery</h1>
+    <div class="gallery">
+        <div class="gallery-folder" id="gallery-folder">
+            <!-- Audio files will be displayed here -->
+        </div>
+    </div>
+
+    <script>
+        let audioFiles = [];
+
+        // Receive the audio file from the admin page
+        window.addEventListener('message', (event) => {
+            if (event.data.type === 'audioFile') {
+                const audioFile = event.data.audioFile;
+                audioFiles.push(audioFile);
+                displayGallery();
+            } else if (event.data.type === 'deleteAudio') {
+                const audioFileName = event.data.audioFileName;
+                audioFiles = audioFiles.filter(file => file.name !== audioFileName);
+                displayGallery();
+            }
+        });
+
+        function displayGallery() {
+            const galleryFolder = document.getElementById('gallery-folder');
+            galleryFolder.innerHTML = '';
+            audioFiles.forEach((audioFile) => {
+                const audioItem = document.createElement('div');
+                audioItem.className = 'gallery-audios';
+                audioItem.innerHTML = `
+                    <h4>${audioFile.name}</h4>
+                    <audio controls>
+                        <source src="${URL.createObjectURL(audioFile)}" type="audio/mp3">
+                        Your browser does not support the audio element.
+                    </audio>
+                    <button onclick="deleteAudio('${audioFile.name}')">Delete</button>
+                `;
+                galleryFolder.appendChild(audioItem);
+            });
+        }
+
+        function deleteAudio(audioFileName) {
+            window.postMessage({ type: 'deleteAudio', audioFileName: audioFileName }, '*');
+        }
+    </script>
+</body>
+</html>
